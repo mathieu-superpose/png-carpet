@@ -11,5 +11,5 @@ void main() {
         discard;
     }
 
-    gl_FragColor = vec4(shadowColor, 1.0);
+    gl_FragColor = vec4(shadowColor, 0.5);
 }
