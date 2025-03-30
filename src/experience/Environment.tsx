@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei"
+import { OrbitControls, OrthographicCamera } from "@react-three/drei"
 
 function Environment({
   ambientLightIntensity = 0.5,
@@ -13,7 +13,16 @@ function Environment({
       <ambientLight intensity={ambientLightIntensity} />
       <directionalLight position={directionalLightPosition} />
 
-      <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+      <OrthographicCamera
+        makeDefault
+        position={[0, 10, 10]}
+        near={0.1}
+        far={1000}
+        left={-10}
+        right={10}
+        top={10}
+        bottom={-10}
+      />
       <OrbitControls />
     </>
   )

@@ -1,6 +1,7 @@
-# React Three Fiber Starter
+# PNG Carpet
 
-A minimal react three fiber starter for simple projects
+A component using React Three Fiber and shaders to display a 3d image with carpet & shadow effect on hover.
+Based on Paola Demichelis [tutorial](https://tympanus.net/codrops/2025/03/24/animating-letters-with-shaders-interactive-text-effect-with-three-js-glsl/) on [Codrops](https://tympanus.net/codrops/)
 
 ## Technology
 

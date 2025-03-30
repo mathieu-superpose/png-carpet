@@ -7,7 +7,7 @@ function Experience() {
   return (
     <div className="Experience">
       <div className="layout">
-        <h1>R3F STARTER</h1>
+        <h1>PNG CARPET</h1>
       </div>
       <div className="canvas">
         <Canvas>
