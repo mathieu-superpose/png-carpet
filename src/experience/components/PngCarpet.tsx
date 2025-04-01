@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from "react"
+import { useMemo, useRef } from "react"
 import * as THREE from "three"
 import { extend, useFrame, useThree } from "@react-three/fiber"
 import { shaderMaterial } from "@react-three/drei"
+import { useIntersectionPosition } from "../../hooks/useIntersectionPosition"
 
 import carpetVertex from "../shaders/carpet/vertex.glsl"
 import carpetFragment from "../shaders/carpet/fragment.glsl"
@@ -22,9 +23,9 @@ function Carpet({
 }: {
   texturePath?: string
 }) {
-  const hitRef = useRef<THREE.Mesh>(null)
-  const meshRef = useRef<THREE.Mesh>(null)
-  const sphereRef = useRef<THREE.Mesh>(null)
+  const carpetRef = useRef<THREE.Mesh>(null)
+  const { camera } = useThree()
+  const { targetPosition } = useIntersectionPosition(carpetRef, camera)
 
   const material = useMemo(() => {
     const material = new CarpetMaterial()
@@ -41,69 +42,20 @@ function Carpet({
     return material
   }, [texturePath])
 
-  const { camera } = useThree()
-  const raycaster = new THREE.Raycaster()
-  const pointer = new THREE.Vector2()
-  const intersectPosition = useMemo(() => new THREE.Vector3(), [])
-
-  useEffect(() => {
-    function onPointerMove(event: { clientX: number; clientY: number }) {
-      pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-      pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
-
-      raycaster.setFromCamera(pointer, camera)
-
-      if (!hitRef.current) {
-        console.warn("Target mesh not found")
-        return
-      }
-
-      const intersects = raycaster.intersectObject(hitRef.current)
-
-      if (intersects.length > 0) {
-        // console.log("intersects", intersects)
-        intersectPosition.copy(intersects[0].point)
-      }
-    }
-
-    window.addEventListener("pointermove", onPointerMove)
-    return () => window.removeEventListener("pointermove", onPointerMove)
-  }, [])
-
   useFrame(() => {
-    material.uniforms.uDisplacement.value.x = intersectPosition.x
-    material.uniforms.uDisplacement.value.y = intersectPosition.y
-    material.uniforms.uDisplacement.value.z = intersectPosition.z
-
-    if (!sphereRef?.current) {
+    if (!targetPosition) {
       return
     }
 
-    sphereRef.current.position.x = intersectPosition.x
-    sphereRef.current.position.y = intersectPosition.y
-    sphereRef.current.position.z = intersectPosition.z
+    material.uniforms.uDisplacement.value.x = targetPosition.x
+    material.uniforms.uDisplacement.value.y = targetPosition.y
+    material.uniforms.uDisplacement.value.z = targetPosition.z
   })
 
   return (
-    <>
-      <mesh ref={hitRef} position={[0, 0, 0.01]}  name="hit">
-        <planeGeometry args={[500, 500, 10, 10]} />
-        <meshBasicMaterial
-          color={0x00ff00}
-          transparent
-          opacity={0.0}
-          depthWrite={false}
-        />
-      </mesh>
-
-      <mesh ref={meshRef} material={material}>
-        <planeGeometry args={[10, 10, 10, 10]} />
-      </mesh>
-      <mesh ref={sphereRef}>
-        <sphereGeometry args={[0.1, 32, 32]} />
-        <meshStandardMaterial color="red" />
-      </mesh>
-    </>
+    <mesh ref={carpetRef} material={material}>
+      <planeGeometry args={[10, 10, 10, 10]} />
+    </mesh>
   )
 }
 
