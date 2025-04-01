@@ -11,7 +11,8 @@ const CarpetMaterial = shaderMaterial(
   {
     uTexture: new THREE.Texture(),
     uDisplacement: new THREE.Vector3(0.0, 0.0, 0.0),
-    uMinDistance: 5.0,
+    uMinDistance: 2.0,
+    uVert: 3.5,
   },
   carpetVertex,
   carpetFragment
@@ -21,13 +22,13 @@ extend({ CarpetMaterial })
 
 function Carpet({
   texturePath = "textures/smiley.png",
+  carpetRef,
+  targetPosition,
 }: {
   texturePath?: string
+  carpetRef: React.RefObject<THREE.Mesh>
+  targetPosition: THREE.Vector3 | null
 }) {
-  const carpetRef = useRef<THREE.Mesh>(null)
-  const { camera } = useThree()
-  const { targetPosition } = useIntersectionPosition(carpetRef, camera)
-
   const material = useMemo(() => {
     const material = new CarpetMaterial()
     const texture = new THREE.TextureLoader().load(texturePath)
@@ -55,7 +56,7 @@ function Carpet({
 
   return (
     <mesh ref={carpetRef} material={material}>
-      <planeGeometry args={[10, 10, 10, 10]} />
+      <planeGeometry args={[10, 10, 100, 100]} />
     </mesh>
   )
 }
@@ -75,14 +76,20 @@ extend({ CarpetShadowMaterial })
 
 function CarpetShadow({
   texturePath = "textures/smiley.png",
+  targetPosition,
 }: {
   texturePath?: string
+  targetPosition: THREE.Vector3 | null
 }) {
   const material = useMemo(() => {
     const material = new CarpetShadowMaterial()
     const texture = new THREE.TextureLoader().load(texturePath)
 
     material.uniforms.uTexture = new THREE.Uniform(texture)
+
+    material.uniforms.uShadowPosition = new THREE.Uniform(
+      new THREE.Vector3(0, 0, 0)
+    )
 
     // transparency
     material.transparent = true
@@ -93,6 +100,16 @@ function CarpetShadow({
 
     return material
   }, [texturePath])
+
+  useFrame(() => {
+    if (!targetPosition) {
+      return
+    }
+
+    material.uniforms.uShadowPosition.value.x = targetPosition.x
+    material.uniforms.uShadowPosition.value.y = targetPosition.y
+    material.uniforms.uShadowPosition.value.z = targetPosition.z
+  })
 
   return (
     <mesh material={material} position={[0, 0, -0.01]}>
@@ -106,10 +123,18 @@ function PngCarpet({
 }: {
   texturePath?: string
 }) {
+  const carpetRef = useRef<THREE.Mesh>(null)
+  const { camera } = useThree()
+  const { targetPosition } = useIntersectionPosition(carpetRef, camera)
+
   return (
     <group>
-      <CarpetShadow texturePath={texturePath} />
-      <Carpet texturePath={texturePath} />
+      <CarpetShadow targetPosition={targetPosition} texturePath={texturePath} />
+      <Carpet
+        carpetRef={carpetRef}
+        targetPosition={targetPosition}
+        texturePath={texturePath}
+      />
     </group>
   )
 }

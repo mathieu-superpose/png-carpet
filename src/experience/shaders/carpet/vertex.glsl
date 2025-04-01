@@ -1,6 +1,7 @@
 varying vec2 vUv;
 uniform vec3 uDisplacement;
 uniform float uMinDistance;
+uniform float uVert;
 
 float easeInOutCubic(float x) {
     return x < 0.5 ? 4. * x * x * x : 1. - pow(-2. * x + 2., 3.) / 2.;
@@ -23,7 +24,7 @@ void main() {
     if(dist < min_distance) {
         float distance_mapped = map(dist, 0., min_distance, 0.5, 0.);
         float val = easeInOutCubic(distance_mapped) * 1.;
-        new_position.z -= val * 2.0;
+        new_position.z -= val * uVert;
     }
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(new_position, 1.0);
