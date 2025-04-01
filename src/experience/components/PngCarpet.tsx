@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react"
+import { RefObject, useMemo, useRef } from "react"
 import * as THREE from "three"
 import { extend, useFrame, useThree } from "@react-three/fiber"
 import { shaderMaterial } from "@react-three/drei"
@@ -26,7 +26,11 @@ function Carpet({
   targetPosition,
 }: {
   texturePath?: string
-  carpetRef: React.RefObject<THREE.Mesh>
+  carpetRef: RefObject<THREE.Mesh<
+    THREE.BufferGeometry<THREE.NormalBufferAttributes>,
+    THREE.Material | THREE.Material[],
+    THREE.Object3DEventMap
+  > | null>
   targetPosition: THREE.Vector3 | null
 }) {
   const material = useMemo(() => {
