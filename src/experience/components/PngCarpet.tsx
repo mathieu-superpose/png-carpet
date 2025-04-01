@@ -11,6 +11,7 @@ const CarpetMaterial = shaderMaterial(
   {
     uTexture: new THREE.Texture(),
     uDisplacement: new THREE.Vector3(0.0, 0.0, 0.0),
+    uMinDistance: 5.0,
   },
   carpetVertex,
   carpetFragment

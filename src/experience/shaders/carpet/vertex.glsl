@@ -1,5 +1,6 @@
 varying vec2 vUv;
 uniform vec3 uDisplacement;
+uniform float uMinDistance;
 
 float easeInOutCubic(float x) {
     return x < 0.5 ? 4. * x * x * x : 1. - pow(-2. * x + 2., 3.) / 2.;
@@ -17,7 +18,7 @@ void main() {
     vec4 worldPosition = modelMatrix * localPosition;
 
     float dist = (length(uDisplacement - worldPosition.rgb));
-    float min_distance = 10.;
+    float min_distance = uMinDistance;
 
     if(dist < min_distance) {
         float distance_mapped = map(dist, 0., min_distance, 0.5, 0.);
