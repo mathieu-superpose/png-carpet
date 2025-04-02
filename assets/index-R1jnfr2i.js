@@ -3980,19 +3980,25 @@ float map(float value, float min1, float max1, float min2, float max2) {
 }
 
 void main() {
-    vec3 shadowColor = vec3(0.1);
+    vec3 shadowColor = vec3(0.01);
 
     float textured = texture2D(uTexture, vUv).a;
 
     float dist = (length(uShadowPosition - vWorldPosition.rgb));
-    float min_distance = 4.0;
-    float opacity = 1.0;
+    float min_distance = 3.5;
+    float opacity = 0.0;
+    float displacement = 0.0;
 
     if(dist < min_distance) {
         float distance_mapped = map(dist, 0., min_distance, 0.5, 0.);
         float val = easeInOutCubic(distance_mapped) * 2.5;
-        opacity -= val;
-    }
+        opacity = max(0.3, 1.0 - val * 0.8);
+        displacement = map(dist, 0., min_distance, 0.0, 0.5);
+
+        if (displacement > 0.2) {
+            discard;
+        }
+    } 
 
     if(textured < 0.5) {
         discard;
