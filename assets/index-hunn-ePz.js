@@ -3980,7 +3980,7 @@ float map(float value, float min1, float max1, float min2, float max2) {
 }
 
 void main() {
-    vec3 shadowColor = vec3(0.01);
+    vec3 shadowColor = vec3(0.0);
 
     float textured = texture2D(uTexture, vUv).a;
 
@@ -3992,13 +3992,13 @@ void main() {
     if(dist < min_distance) {
         float distance_mapped = map(dist, 0., min_distance, 0.5, 0.);
         float val = easeInOutCubic(distance_mapped) * 2.5;
-        opacity = max(0.3, 1.0 - val * 0.8);
+        opacity = max(0.2, 1.7 - val * 2.0);
         displacement = map(dist, 0., min_distance, 0.0, 0.5);
 
-        if (displacement > 0.2) {
+        if(displacement > 0.2) {
             discard;
         }
-    } 
+    }
 
     if(textured < 0.5) {
         discard;
